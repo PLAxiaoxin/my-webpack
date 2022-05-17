@@ -5,6 +5,8 @@ import ejs from "ejs"; // 配置代码模版，生成代码代码
 import path from "path";
 import { transformFromAst } from "babel-core"; // 代码转换， esm - cjs
 import {jsonLoader} from "./jsonLoader.js";
+import { ChangeOutputPath } from "./ChangeOutputPath.js";
+import { SyncHook } from "tapable";
 let id = 0;
 
 const webpackConfig = {
@@ -13,7 +15,14 @@ const webpackConfig = {
 			test: /\.json$/,
 			use: [jsonLoader]
 		}]
-	}
+	},
+	plugins:[ new ChangeOutputPath()]
+}
+
+
+const hooks = {
+	// 初始化钩子
+	emitFile: new SyncHook(["context"])
 }
 
 function createAsset(filePath){
@@ -33,6 +42,7 @@ function createAsset(filePath){
 	loaders.forEach(({test, use}) => {
 		if(test.test(filePath)){
 			if(Array.isArray(use)){
+				
 				use.forEach((fn) => {
 					source = fn.call(loaderContext, source);
 				});
@@ -65,6 +75,17 @@ function createAsset(filePath){
 	}
 }
 
+// 初始化pligin
+function initPlugins(){
+	const plugins = webpackConfig.plugins;
+	plugins.forEach((plugin) => {
+		// 注册事件
+		plugin.apply(hooks);
+	});
+}
+
+initPlugins();
+
 function craeteGraph(){
 	const mianAseet = createAsset("./example/main.js");
 
@@ -82,8 +103,6 @@ function craeteGraph(){
 }
 
 const graph = craeteGraph();
-// console.log(graph);
-
 
 function build(graph){
 	const template = fs.readFileSync("./bundle.ejs", {
@@ -98,9 +117,16 @@ function build(graph){
 			mapping
 		}
 	});
-
+	let outputPath = "./dist/bundle.js";
 	const code = ejs.render(template, { data });
-	fs.writeFileSync("./dist/bundle.js", code);
+	const context = {
+		changeOutputPath(path){
+			outputPath = path;
+		}
+	}
+	// 触发事件
+	hooks.emitFile.call(context);
+	fs.writeFileSync(outputPath, code);
 }
 
 build(graph);
