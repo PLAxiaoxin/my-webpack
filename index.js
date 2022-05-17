@@ -1,7 +1,7 @@
 import fs from "fs";
 import parser from "@babel/parser"; // 解析代码为 ast
 import traverse from "@babel/traverse"; // 通过 ast获取依赖路径
-import ejs from "ejs"; // 配置代码模版，生成代码代码
+import ejs from "ejs"; // 配置代码模版，生成代码
 import path from "path";
 import { transformFromAst } from "babel-core"; // 代码转换， esm - cjs
 import {jsonLoader} from "./jsonLoader.js";
