@@ -23,29 +23,29 @@
  1. 事件初始化
 
 ```js 
-		const hooks = {
-			// 初始化钩子
-			emitFile: new SyncHook(["context"])
-		 }
+const hooks = {
+	// 初始化钩子
+	emitFile: new SyncHook(["context"])
+}
 ```
 
 2. 注册事件 
 
 ```js
-	export class ChangeOutputPath{
-		apply(hooks){
-			hooks.emitFile.tap("changeOutputPath", (context)=>{
-				context.changeOutputPath("./dist/wzx.js")
-				console.log("changeOutputPath");	
-			})
-		}
+export class ChangeOutputPath{
+	apply(hooks){
+		hooks.emitFile.tap("changeOutputPath", (context)=>{
+			context.changeOutputPath("./dist/wzx.js")
+			console.log("changeOutputPath");	
+		})
 	}
+}
 ```
 
 3. 触发事件
 
 ```js
-	hooks.emitFile.call(context);
+hooks.emitFile.call(context);
 ``` 
 
 *** ⚠️注意事项 ***
