@@ -21,15 +21,17 @@
  ## plugin 实现流程
  > 原理：基于 webpack 执行过程中产生的回调事件进行处理。
  1. 事件初始化
-  ```javasctip 
+
+```js 
 		const hooks = {
 			// 初始化钩子
 			emitFile: new SyncHook(["context"])
 		 }
-	```
+```
 
 2. 注册事件 
-```javasctip
+
+```js
 	export class ChangeOutputPath{
 		apply(hooks){
 			hooks.emitFile.tap("changeOutputPath", (context)=>{
@@ -39,10 +41,13 @@
 		}
 	}
 ```
+
 3. 触发事件
-```javasctip
+
+```js
 	hooks.emitFile.call(context);
 ``` 
+
 *** ⚠️注意事项 ***
 - 注册事件时，必须实现 apply 方法。
  
